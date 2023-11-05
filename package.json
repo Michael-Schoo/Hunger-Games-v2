@@ -1,0 +1,25 @@
+{
+  "name": "hunger-games",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "start:game": "bun ./apps/game/src/main.ts",
+    "dev:game": "bun --watch ./apps/game/src/main.ts",
+    "build:website": "cd apps/visualization && next build",
+    "dev:website": "cd apps/visualization && next dev",
+    "add a": "echo hi"
+  },
+  "author": "",
+  "workspaces": [
+    "apps/game",
+    "apps/visualization"
+  ],
+  "module": "index.ts",
+  "type": "module",
+  "devDependencies": {
+    "bun-types": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
