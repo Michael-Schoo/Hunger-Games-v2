@@ -14,8 +14,46 @@ import {
 } from "@tremor/react";
 import { useState } from "react";
 import { ExportedData, useData } from "./lib/get-data";
-import Loading from "./components/loading";
-import PeopleList from "@/app/people-list.client";
+
+function formatAge(people: ExportedData["people"]) {
+  // Assuming the data is an array of objects with district and age properties
+
+  // Initialize an empty object to store the intermediate result
+  let intermediate = {} as Record<string, Record<string, number>>;
+
+  // Loop through the data array
+  for (let item of people) {
+    // Get the district and age values of the current item
+    let district = item.district;
+    let age = item.age;
+
+    // Check if the intermediate object already has a property with the age value
+    if (intermediate.hasOwnProperty(age)) {
+      // If yes, increment the count of the district by one
+      intermediate[age][`District ${district}`] = (intermediate[age][`District ${district}`] || 0) + 1;
+    } else {
+      // If not, create a new property with the age value and assign an object with the district and count of one
+      intermediate[age] = {[`District ${district}`]: 1};
+    }
+  }
+
+  // Initialize an empty array to store the final result
+  let result = [];
+
+  // Loop through the intermediate object
+  for (let key in intermediate) {
+    // Get the value of the current key
+    let value = intermediate[key];
+
+    // Add a new object to the result array with the age and district properties
+    result.push({age: Number(key), ...value});
+  }
+
+  // sort by age
+  return result.sort((a, b) => a.age - b.age);
+  // return result;
+}
+
 export default function PopulationGraph() {
   const data = useData()
 
@@ -28,7 +66,7 @@ export default function PopulationGraph() {
     // each age has a value for each district - it is in the same dict
     // ie age 50 has dict of { district1: 1, district2: 2, ... }
     // data.data!.people is the array of people with age and district as props
-    data: data.data!.,
+    data: formatAge(data.data!.people),
     index: "age",
     categories: ["District 1", "District 2", "District 3", "District 4", "District 5", "District 6", "District 7", "District 8", "District 9", "District 10", "District 11", "District 12"],
     colors: ["red", "orange", "amber", "yellow", "lime", "green", "emerald", "teal", "cyan", "sky", "blue", "indigo"],
