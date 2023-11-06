@@ -44,7 +44,7 @@ jobs:
         uses: actions/configure-pages@v3
         with:
             static_site_generator: next
-            generator_config_file: .apps/visualization/next.config.js
+            generator_config_file: ./apps/visualization/next.config.js
 
       - id: restore-nextjs-cache
         name: Restore cache (nextjs)

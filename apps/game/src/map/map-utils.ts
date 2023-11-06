@@ -105,7 +105,22 @@ export function makeMap() {
             map.set(key, {type: MapBiome.SpawnPoint})
         }
 
+        if (MAP_SPAWN_GROUPS === 1) {
+            map.set(`${MAP_SIZE / 2}-${MAP_SIZE / 2}`, {type: MapBiome.Lootbox})
+        } else if (MAP_SPAWN_GROUPS === 4) {
+            // lootbox in middle of each group
+            const [xOffset, yOffset] =
+                group === 0 ? [-MAP_SPAWN_GROUPS_OFFSET, MAP_SPAWN_GROUPS_OFFSET]
+                : group === 1 ? [MAP_SPAWN_GROUPS_OFFSET, -MAP_SPAWN_GROUPS_OFFSET]
+                : group === 2 ? [-MAP_SPAWN_GROUPS_OFFSET, -MAP_SPAWN_GROUPS_OFFSET]
+                : group === 3 ? [MAP_SPAWN_GROUPS_OFFSET, MAP_SPAWN_GROUPS_OFFSET]
+                : [0, 0]
+
+            map.set(`${MAP_SIZE / 2 + xOffset}-${MAP_SIZE / 2 + yOffset}`, {type: MapBiome.Lootbox})
+        }
+
     }
+
     // console.log(convertMapToStr(map, mapConfig))
     return map
 

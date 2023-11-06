@@ -3,8 +3,10 @@ import Game from "../game.js";
 import Person from "../people.js";
 import {round} from "../utils.js";
 import assert from "assert/strict";
-import {howAdjacent, isValidFight} from "./find-moves.js";
+import {howAdjacent, isValidFight, TurnAction} from "./find-moves.js";
 import {MapBiome, MapTile} from "./map-types.js";
+import {YEARS_TO_SIMULATE} from "../constants.js";
+import {makeRandomStats} from "./decide-random-action-stat.js";
 
 export default class Player {
     readonly person: Person;
@@ -12,6 +14,7 @@ export default class Player {
     readonly map: GameMap
     location: [number, number]
     hp = 99
+    readonly preferTurnAction:  Record<TurnAction, number>
 
     constructor(person: Person, map: GameMap, spawnLocation: [number, number]) {
         this.person = person;
@@ -26,9 +29,11 @@ export default class Player {
         assert(!tile.player, 'tile can\'t already have player')
         tile.player = this
         this.map.map.set(key, tile)
+
+        this.preferTurnAction = makeRandomStats(person.district.currentTurnActionWeightings ?? null, YEARS_TO_SIMULATE - this.game.year)
     }
 
-    get currentTile() {
+    get currentTile(): MapTile {
         const tile = this.map.getTile(...this.location)
         assert(tile, "Tile doesn't exist")
         return tile

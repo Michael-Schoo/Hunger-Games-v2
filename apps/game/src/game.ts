@@ -67,7 +67,7 @@ export default class Game {
             this.killPeople();
         }
 
-        // get 2 players from each district (one male and one female)
+        // get some players from each district (some male and female)
         const players: Person[] = []
         for (const district of this.districts) {
             players.push(...this.choosePlayers(district))
@@ -76,11 +76,12 @@ export default class Game {
         if (players.length) {
             //? Start hunger games
             console.time("game "+this.year)
-            console.log(this.year, this.year, this.year, '\n')
+
             const map = new GameMap(players, this)
             map.start()
-            console.log(map.turn)
+
             console.timeEnd("game "+this.year)
+            console.log()
 
         } else {
             console.log("No players that can play")
@@ -91,7 +92,7 @@ export default class Game {
         for (const district of this.districts) {
             const deaths = district.people.filter(person => person.diedAt === this.year).length;
             const births = district.people.filter(person => person.age === 0).length;
-            district.addCensus({ year: this.year, deaths, births });
+            district.addCensus({ year: this.year, deaths, births, bestTurnAction: district.currentTurnActionWeightings! });
         }
 
         this.year += 1;
@@ -175,8 +176,8 @@ export default class Game {
         const chosen: Person[] = []
 
         for (const i of range(RANDOM_PEOPLE_CHOSEN)) {
-            const  amountOfMales = chosen.filter(e=> e.sex === 'male').length
-            const  amountOfFemales = chosen.filter(e=> e.sex === 'female').length
+            const  amountOfMales = chosen.filter(e=> e?.sex === 'male').length
+            const  amountOfFemales = chosen.filter(e=> e?.sex === 'female').length
 
             if (Math.abs(amountOfMales / amountOfFemales) < RANDOM_PEOPLE_GENDER_SPLIT) {
                 if (amountOfMales > amountOfFemales) {

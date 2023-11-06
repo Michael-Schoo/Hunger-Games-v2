@@ -1,5 +1,6 @@
 import Game from "./game.js";
 import Person from "./people.js";
+import {TurnAction} from "./map/find-moves.js";
 
 export interface DistrictProps {
     // name: string,
@@ -10,7 +11,8 @@ export interface DistrictProps {
 export interface CensusProp {
     year: number,
     deaths: number,
-    births: number
+    births: number,
+    bestTurnAction: Record<TurnAction, number>,
 }
 
 /** Districts for Hunger Games */
@@ -26,6 +28,8 @@ export default class District {
         this.type = district.type;
         this.game = district.game;
     }
+
+    currentTurnActionWeightings: Record<TurnAction, number> | null = null
 
     get name() {
         return `District ${this.type}: ${districtsNamed[this.type]}`;
@@ -43,6 +47,7 @@ export default class District {
             ...census,
             population: this.people.length,
             nourishment: this.nourishment,
+
         });
     }
 
@@ -56,6 +61,7 @@ export interface DistrictCensus {
     births: number,
     population: number,
     nourishment: number,
+    bestTurnAction: Record<TurnAction, number>,
 }
 
 

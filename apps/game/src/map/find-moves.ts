@@ -1,20 +1,22 @@
 import {GameMap} from "./map.js";
 import Player from "./player.js";
 import {MapTile} from "./map-types.js";
-import {pathfindingToClosestPlayer} from "./pathfinding.js";
+import {pathfindingToClosestPlayer, pathfindToPoint} from "./pathfinding.js";
 
 export enum MovementChoice {
     Up,
     Down,
     Left,
     Right,
+    None
 }
 
 export enum TurnAction {
     Move,
     Fight,
     Pass,
-    Hide
+    Hide,
+    Loot,
 }
 
 export function getRandomMove(map: GameMap, player: Player) {
@@ -22,11 +24,33 @@ export function getRandomMove(map: GameMap, player: Player) {
     return validMoves[Math.floor(Math.random() * validMoves.length)]
 }
 
-export function getPathfindedMove(map: GameMap, player: Player) {
-    const bestMove = pathfindingToClosestPlayer(map, player)
-    if (!bestMove) return getRandomMove(map, player)
+export function getSmartMove(map: GameMap, player: Player) {
+    let move: MovementChoice | null = null
 
-    const cord = getCordAfterMove(player, bestMove)
+    // choose which action to do based on the user's weightings and random
+
+    // decide to fight
+    if (Math.random() <= (player.preferTurnAction[TurnAction.Fight] / 100)*6.5) {
+        move = pathfindingToClosestPlayer(map, player)
+    } else if (Math.random() <= (player.preferTurnAction[TurnAction.Move] / 10)*6.5) {
+        return getRandomMove(map, player)
+    } else if (Math.random() <= (player.preferTurnAction[TurnAction.Hide] / 10)*6.5) {
+        // decide to hide
+        return {
+            choice: MovementChoice.None,
+            action: TurnAction.Hide,
+            location: {
+                cords: player.location,
+                tile: player.currentTile
+            }
+        }
+    } else if (Math.random() <= (player.preferTurnAction[TurnAction.Loot] / 100)*6.5) {
+        move = pathfindToPoint(map, player)
+    }
+    if (!move) return getRandomMove(map, player)
+
+
+    const cord = getCordAfterMove(player, move)
     const tile = map.getTile(...cord, false)
     if (!tile) return getRandomMove(map, player)
 
@@ -35,9 +59,8 @@ export function getPathfindedMove(map: GameMap, player: Player) {
     // todo, somehow the tile is still there even if dead?
     if (tile.player?.hp !== 0 && !tile.player?.person.alive) return getRandomMove(map, player)
 
-
     return {
-        choice: bestMove,
+        choice: move,
         action: tile.player ? TurnAction.Fight : TurnAction.Move,
         fight: tile.player,
         location: {
@@ -48,7 +71,7 @@ export function getPathfindedMove(map: GameMap, player: Player) {
 
 }
 
-export default function findValidMoves(map: GameMap, player: Player) {
+export default function findValidMoves(map: GameMap, player: Player, allowFighting = false) {
     const [playerX, playerY] = player.location
     const moves = [
         MovementChoice.Up,
@@ -78,6 +101,10 @@ export default function findValidMoves(map: GameMap, player: Player) {
         }
 
         if (tile.player) {
+            if (!allowFighting) {
+                continue
+            }
+
             if (tile.player.person.district === player.person.district) {
                 // console.log("same district")
                 continue

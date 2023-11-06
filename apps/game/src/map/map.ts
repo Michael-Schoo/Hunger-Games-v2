@@ -3,8 +3,8 @@ import Player from "./player.js"
 import Game from "../game.js"
 import {convertMapToStr, makeCircleCords, makeMap} from "./map-utils.js"
 import assert from "assert/strict";
-import {MapBiomeConfig, MapCord, MapBiome, MapTile} from "./map-types.js";
-import findValidMoves, {getPathfindedMove, getRandomMove, TurnAction} from "./find-moves.js";
+import {MapBiome, MapCord, MapTile} from "./map-types.js";
+import {getSmartMove, TurnAction} from "./find-moves.js";
 import {MAP_SIZE, mapConfig} from "../constants.js";
 
 export class GameMap {
@@ -90,7 +90,7 @@ export class GameMap {
 
             //? check valid moves
             // const move = getRandomMove(this, player)
-            const move = getPathfindedMove(this, player)
+            const move = getSmartMove(this, player)
 
             if (!move) {
                 continue
@@ -100,22 +100,40 @@ export class GameMap {
             // choose a move
             if (move.action === TurnAction.Fight) {
                 player.fight(move.location.tile.player!, 10)
+            } else if (move.action === TurnAction.Loot) {
+                move.location.tile.type = MapBiome.Plain
+                // gives the loot to player
+                player.hp = 150
+            } else if (move.action === TurnAction.Hide) {
+                // they hid
+                player.hp += 10
             } else {
                 player.move(...move.location.cords)
             }
 
         }
 
-        console.clear()
-        console.log(`Year: ${this.game.year}, Turn: ${this.turn}`)
+        // get the best player in each district
+        for (const district of this.game.districts) {
+            // save the best player's stats
+            const bestPlayer = this.players
+                .filter(p => p.person.district === district)
+                .sort((a, b) => (a.person.diedAt ?? Infinity) - (b.person.diedAt ?? Infinity))[0]
+
+            district.currentTurnActionWeightings = bestPlayer?.preferTurnAction
+        }
+
         if (process.argv.includes('--print-map')) {
             console.log(convertMapToStr(this, mapConfig, [this.game.year, this.turn  % MAP_SIZE]))
             // Bun.sleepSync(100)
+        } else if (process.argv.includes('--debug-map')) {
+            console.clear()
+            console.log(`Year: ${this.game.year}, Turn: ${this.turn}`)
         }
 
         this.turn += 1;
         if (!this.players.some(p=> p.person.alive)) {
-            console.log("\nA game over in "+this.turn)
+            console.log(`${this.game.year}: A game over in ${this.turn} turns`)
             this.gameOver = true
         }
 

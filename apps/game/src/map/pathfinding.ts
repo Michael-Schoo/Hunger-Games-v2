@@ -2,7 +2,7 @@ import {GameMap} from "./map.js";
 import Player from "./player.js";
 import {makeCircleCords} from "./map-utils.js";
 import {MAP_SIZE} from "../constants.js";
-import {MapTile} from "./map-types.js";
+import {MapBiome, MapTile, tileBiomeList} from "./map-types.js";
 import {getCordAfterMove, howAdjacent, MovementChoice, TurnAction} from "./find-moves.js";
 
 
@@ -98,7 +98,10 @@ export function getBestDirection(map: GameMap, current: [number, number], target
             case MovementChoice.Right:
                 newCoordinate = [current[0] + 1, current[1]];
                 break;
+            default:
+                throw new Error("Invalid direction");
         }
+
         const tile = map.getTile(...newCoordinate, false)
         if (tile && !tile.player) {
             distance = Math.abs(newCoordinate[0] - target[0]) + Math.abs(newCoordinate[1] - target[1]);
@@ -111,3 +114,28 @@ export function getBestDirection(map: GameMap, current: [number, number], target
 
     return bestDirection;
 }
+
+export function pathfindToPoint(map: GameMap, player: Player): MovementChoice | null {
+    // get best direction to lootbox - there are 4 lootboxes
+
+    const lootBoxes = [...map.map.entries()]
+        .filter(e=>e[1].type === MapBiome.Lootbox)
+        .map(e => {
+            const [x, y] = e[0].split('-').map(n => parseInt(n)) as [number, number]
+            return {x, y}
+        })
+
+//     find closest
+    const closestLootBox = lootBoxes.sort((a, b) => {
+        const proximityA = howAdjacent(player.location, [a.x, a.y])
+        const proximityB = howAdjacent(player.location, [b.x, b.y])
+        return proximityA - proximityB
+    })[0]
+
+    if (!closestLootBox) return null
+
+    const action = getBestDirection(map, player.location, [closestLootBox.x, closestLootBox.y])
+    return action
+
+}
+

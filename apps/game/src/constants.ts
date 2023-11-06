@@ -1,13 +1,13 @@
 import {MapBiomeConfig, MapBiome} from "./map/map-types.js";
 
 /** How many people are generated in each district initially */
-export const INITIAL_PEOPLE_PER_DISTRICT = 500;
+export const INITIAL_PEOPLE_PER_DISTRICT = 1000;
 
 // /** How many seconds each day lasts */
 // export const LENGTH_OF_DAY = 30
 
 /** How many years to run */
-export const YEARS_TO_SIMULATE = 10;
+export const YEARS_TO_SIMULATE = 100;
 
 export const MIN_FIGHT_AGE = 14;
 export const MIN_MARRIAGE_AGE = 18;
