@@ -7,7 +7,7 @@ export enum MapBiome {
     Forest,
     Mountain,
     Lootbox,
-    SpawnPoint, // effectively plain tho
+    SpawnPoint, // effectively plain
     Lake
 }
 
@@ -38,6 +38,6 @@ export type MapCord = `${number}-${number}`
 export type MapTile = {
     type: MapBiome,
     player?: Player,
-    // how many turns left until it kills you (if 0 and player on it, death)
+    /** how many turns left until it kills you (if 0 and player on it, death) */
     redZone?: number
 }

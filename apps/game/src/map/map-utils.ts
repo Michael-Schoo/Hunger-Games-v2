@@ -1,12 +1,12 @@
-import {districts} from "../districts.js"
-import {range} from "../utils.js"
+import { districts } from "../districts.js"
+import { range } from "../utils.js"
 import assert from "assert/strict";
-import {MapBiome, MapBiomeConfig, MapCord, MapTile, tileBiomeList} from "./map-types.js";
-import {MAP_SIZE, MAP_SPAWN_GROUPS, MAP_SPAWN_GROUPS_OFFSET, MAP_SPAWN_SIZE, mapConfig} from "../constants.js";
+import { MapBiome, MapBiomeConfig, MapCord, MapTile, tileBiomeList } from "./map-types.js";
+import { MAP_SIZE, MAP_SPAWN_GROUPS, MAP_SPAWN_GROUPS_OFFSET, MAP_SPAWN_SIZE } from "../constants.js";
 import pc from "picocolors"
-import Game from "../game.js";
-import {GameMap} from "./map.js";
+import { GameMap } from "./map.js";
 
+/** Use rudimentary method to find the map size */
 export function mapSize(map: Map<MapCord, MapTile>): [number, number] {
     const mapEntries = [...map.entries()]
 
@@ -15,7 +15,7 @@ export function mapSize(map: Map<MapCord, MapTile>): [number, number] {
     return [maxX, maxY]
 }
 
-
+/** Convert a string map to a Map - useful when testing and not wanting to use random */
 export function convertStrMapToActual(mapStr: string, mapConfig: MapBiomeConfig) {
     // map = map.replace(/[\w\W]+?\n+?/, "");
     const map = new Map<MapCord, MapTile>()
@@ -25,7 +25,6 @@ export function convertStrMapToActual(mapStr: string, mapConfig: MapBiomeConfig)
     let x = 0
     for (const line of mapStr.split('\n')) {
         if (line == '') {
-            // long += 1
             continue
         }
 
@@ -35,8 +34,7 @@ export function convertStrMapToActual(mapStr: string, mapConfig: MapBiomeConfig)
         for (const char of line.split(/\s+/g)) {
             y += 1
 
-            const typeStr = Object.entries(mapConfig)
-                .find(e => e[1] === char)
+            const typeStr = Object.entries(mapConfig).find(e => e[1] === char)
 
             if (!typeStr) {
                 if (char !== '') console.warn('Unknown Char: ' + char)
@@ -51,7 +49,6 @@ export function convertStrMapToActual(mapStr: string, mapConfig: MapBiomeConfig)
             }
 
         }
-        // map.set('1-1', {type: 1})
     }
 
     assert.equal(
@@ -73,8 +70,8 @@ export function convertStrMapToActual(mapStr: string, mapConfig: MapBiomeConfig)
     return map
 }
 
+/** Make the random map */
 export function makeMap() {
-    // TODO: not just random
     const map = new Map<MapCord, MapTile>()
 
     // make a circle map
@@ -85,51 +82,50 @@ export function makeMap() {
     }
 
     // make the mini circles
-    const miniCircles = [...makeCircleCords(MAP_SIZE , MAP_SPAWN_SIZE, true)]
-// console.log(miniCircles.length)
+    const miniCircles = [...makeCircleCords(MAP_SIZE, MAP_SPAWN_SIZE, true)]
+    // console.log(miniCircles.length)
     for (const group of range(MAP_SPAWN_GROUPS)) {
-        for (const[x, y] of miniCircles) {
+        for (const [x, y] of miniCircles) {
             let key: MapCord = `${x}-${y}`
             if (MAP_SPAWN_GROUPS === 1) {
                 // pass
             } else if (MAP_SPAWN_GROUPS === 4) {
+                // get the offset for each group
                 const [xOffset, yOffset] =
                     group === 0 ? [-MAP_SPAWN_GROUPS_OFFSET, MAP_SPAWN_GROUPS_OFFSET]
-                    : group === 1 ? [MAP_SPAWN_GROUPS_OFFSET, -MAP_SPAWN_GROUPS_OFFSET]
-                    : group === 2 ? [-MAP_SPAWN_GROUPS_OFFSET, -MAP_SPAWN_GROUPS_OFFSET]
-                    : group === 3 ? [MAP_SPAWN_GROUPS_OFFSET, MAP_SPAWN_GROUPS_OFFSET]
-                    : [0, 0]
+                        : group === 1 ? [MAP_SPAWN_GROUPS_OFFSET, -MAP_SPAWN_GROUPS_OFFSET]
+                            : group === 2 ? [-MAP_SPAWN_GROUPS_OFFSET, -MAP_SPAWN_GROUPS_OFFSET]
+                                : group === 3 ? [MAP_SPAWN_GROUPS_OFFSET, MAP_SPAWN_GROUPS_OFFSET]
+                                    : [0, 0]
 
                 key = `${x - xOffset}-${y - yOffset}` as MapCord
             }
-            map.set(key, {type: MapBiome.SpawnPoint})
+            map.set(key, { type: MapBiome.SpawnPoint })
         }
 
         if (MAP_SPAWN_GROUPS === 1) {
-            map.set(`${MAP_SIZE / 2}-${MAP_SIZE / 2}`, {type: MapBiome.Lootbox})
+            map.set(`${MAP_SIZE / 2}-${MAP_SIZE / 2}`, { type: MapBiome.Lootbox })
         } else if (MAP_SPAWN_GROUPS === 4) {
             // lootbox in middle of each group
             const [xOffset, yOffset] =
                 group === 0 ? [-MAP_SPAWN_GROUPS_OFFSET, MAP_SPAWN_GROUPS_OFFSET]
-                : group === 1 ? [MAP_SPAWN_GROUPS_OFFSET, -MAP_SPAWN_GROUPS_OFFSET]
-                : group === 2 ? [-MAP_SPAWN_GROUPS_OFFSET, -MAP_SPAWN_GROUPS_OFFSET]
-                : group === 3 ? [MAP_SPAWN_GROUPS_OFFSET, MAP_SPAWN_GROUPS_OFFSET]
-                : [0, 0]
+                    : group === 1 ? [MAP_SPAWN_GROUPS_OFFSET, -MAP_SPAWN_GROUPS_OFFSET]
+                        : group === 2 ? [-MAP_SPAWN_GROUPS_OFFSET, -MAP_SPAWN_GROUPS_OFFSET]
+                            : group === 3 ? [MAP_SPAWN_GROUPS_OFFSET, MAP_SPAWN_GROUPS_OFFSET]
+                                : [0, 0]
 
-            map.set(`${MAP_SIZE / 2 + xOffset}-${MAP_SIZE / 2 + yOffset}`, {type: MapBiome.Lootbox})
+            map.set(`${MAP_SIZE / 2 + xOffset}-${MAP_SIZE / 2 + yOffset}`, { type: MapBiome.Lootbox })
         }
 
     }
 
-    // console.log(convertMapToStr(map, mapConfig))
     return map
-
 }
 
-
+/** Function to create a circle and give out coordinates */
 export function* makeCircleCords(size = 100, R = 50, ring = false, centerCord?: [number, number]): Generator<[number, number]> {
     // logic from https://gist.github.com/shalithasuranga/0ca72ad75047f00f654e295e70a61911
-    const [centerX, centerY] = centerCord ??  [size / 2,  size / 2];
+    const [centerX, centerY] = centerCord ?? [size / 2, size / 2];
 
     for (const x of range(size)) {
         for (const y of range(size)) {
@@ -146,21 +142,25 @@ export function* makeCircleCords(size = 100, R = 50, ring = false, centerCord?: 
 }
 
 
-
+/** Turns a map into a printable visualization */
 export function convertMapToStr(map: GameMap, mapConfig: MapBiomeConfig, highlight?: [number, number]) {
     const [maxX, maxY] = mapSize(map.map)
     let msg = ''
 
     for (const x of range({ start: 1, end: maxX + 1 })) {
         for (const y of range({ start: 1, end: maxY + 1 })) {
+            // get the actual entry here
             const entry = map.map.get(`${x}-${y}`)
             let emoji = entry?.type !== undefined ? mapConfig[entry.type] : "  "
             if (entry?.player) {
                 emoji = entry.player.hp.toString()
             }
+
+            // add background colors 
             if ((highlight?.[0] === x || highlight?.[1] === y)) emoji = pc.bgYellow(emoji)
             if ((entry?.redZone || Infinity) <= map.turn) emoji = pc.bgRed(emoji)
             if (entry?.redZone) emoji = pc.bgMagenta(emoji)
+
             msg += `${emoji}`
         }
         msg += '\n'

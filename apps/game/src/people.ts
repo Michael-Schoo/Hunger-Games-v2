@@ -14,6 +14,7 @@ export interface PersonProps {
     game: Game
 }
 
+/** IDs are hard... so I make a counter to still have them unique */
 let _idIncrement = 0;
 
 export default class Person {

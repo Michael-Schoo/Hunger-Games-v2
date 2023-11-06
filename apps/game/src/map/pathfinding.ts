@@ -1,31 +1,30 @@
-import {GameMap} from "./map.js";
+import { GameMap } from "./map.js";
 import Player from "./player.js";
-import {makeCircleCords} from "./map-utils.js";
-import {MAP_SIZE} from "../constants.js";
-import {MapBiome, MapTile, tileBiomeList} from "./map-types.js";
-import {getCordAfterMove, howAdjacent, MovementChoice, TurnAction} from "./find-moves.js";
+import { makeCircleCords } from "./map-utils.js";
+import { MAP_SIZE } from "../constants.js";
+import { MapBiome, MapTile } from "./map-types.js";
+import { getCordAfterMove, howAdjacent, MovementChoice, TurnAction } from "./find-moves.js";
 
 
-
+/** Only gives the minimap for a certain radius */
 function getProximityMap(map: GameMap, coordinates: [number, number], radius: number) {
-    const circleCords = makeCircleCords(MAP_SIZE, radius, false,  coordinates)
-    // return circle
+    const circleCords = makeCircleCords(MAP_SIZE, radius, false, coordinates)
 
-    const tiles: {x: number, y: number, tile: MapTile}[] = []
+    const tiles: { x: number, y: number, tile: MapTile }[] = []
     for (const [x, y] of circleCords) {
         const tile = map.getTile(x, y, false)
-        if (tile) tiles.push({x, y, tile})
+        if (tile) tiles.push({ x, y, tile })
 
     }
 
     return tiles
 }
 
-/** small pathfinding for close proximity and returns weightings */
+/** Small pathfinding for close proximity and returns weightings */
 export function pathfindingToClosestPlayer(map: GameMap, player: Player) {
     // check if currently in red zone, if so to go center
     if (player.currentTile.redZone) {
-        const action = getBestDirection(map, player.location, [MAP_SIZE /2, MAP_SIZE /2])
+        const action = getBestDirection(map, player.location, [MAP_SIZE / 2, MAP_SIZE / 2])
         return action
     }
 
@@ -34,9 +33,9 @@ export function pathfindingToClosestPlayer(map: GameMap, player: Player) {
     const tiles = getProximityMap(map, player.location, 3)
 
     const playerTiles = tiles
-        .filter(({tile}) =>
+        .filter(({ tile }) =>
             tile.player?.person.district.type !== player.person.district.type
-                && tile.player?.person.alive
+            && tile.player?.person.alive
         )
         .sort((tileA, tileB) => {
             const proximityA = howAdjacent(player.location, [tileA.x, tileA.y])
@@ -49,6 +48,7 @@ export function pathfindingToClosestPlayer(map: GameMap, player: Player) {
 
     if (!playerTiles.length) return null
 
+    // do through all the tiles and find the best one
     while (playerTiles.length) {
 
         const suggestedTile = playerTiles.shift()
@@ -70,13 +70,14 @@ export function pathfindingToClosestPlayer(map: GameMap, player: Player) {
     return null
 }
 
+/** Find the best direction to get to a place */
 export function getBestDirection(map: GameMap, current: [number, number], target: [number, number]): MovementChoice | null {
     const directions = [
         MovementChoice.Up,
         MovementChoice.Down,
         MovementChoice.Left,
         MovementChoice.Right
-    ].sort(()=> Math.random() - 0.5 )
+    ].sort(() => Math.random() - 0.5)
 
     let bestDirection: MovementChoice | null = null;
     let minDistance = Infinity;
@@ -115,17 +116,17 @@ export function getBestDirection(map: GameMap, current: [number, number], target
     return bestDirection;
 }
 
+/** Get best direction to lootbox - there are 4 lootboxes */
 export function pathfindToPoint(map: GameMap, player: Player): MovementChoice | null {
-    // get best direction to lootbox - there are 4 lootboxes
 
     const lootBoxes = [...map.map.entries()]
-        .filter(e=>e[1].type === MapBiome.Lootbox)
+        .filter(e => e[1].type === MapBiome.Lootbox)
         .map(e => {
             const [x, y] = e[0].split('-').map(n => parseInt(n)) as [number, number]
-            return {x, y}
+            return { x, y }
         })
 
-//     find closest
+    // find closest
     const closestLootBox = lootBoxes.sort((a, b) => {
         const proximityA = howAdjacent(player.location, [a.x, a.y])
         const proximityB = howAdjacent(player.location, [b.x, b.y])

@@ -1,6 +1,6 @@
 import Game from "./game.js";
 import Person from "./people.js";
-import {TurnAction} from "./map/find-moves.js";
+import { TurnAction } from "./map/find-moves.js";
 
 export interface DistrictProps {
     // name: string,
@@ -29,6 +29,7 @@ export default class District {
         this.game = district.game;
     }
 
+    /** The decision weightings for players to build their decisions upon */
     currentTurnActionWeightings: Record<TurnAction, number> | null = null
 
     get name() {
@@ -56,7 +57,6 @@ export default class District {
 /** The deaths and births for each year - just information to show */
 export interface DistrictCensus {
     year: number,
-
     deaths: number,
     births: number,
     population: number,
@@ -112,4 +112,3 @@ export const districtsNamed = {
     [DistrictType.Agriculture]: "Agriculture",
     [DistrictType.Coal]: "Coal",
 } satisfies Record<DistrictType, string>
-

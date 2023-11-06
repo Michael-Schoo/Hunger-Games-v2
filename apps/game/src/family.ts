@@ -28,13 +28,13 @@ export class Family {
             "Parents must be in the same district"
         );
 
-        // correct sex
+        // check that they are the correct sex
         assert.equal(this.parentMale.sex, "male", "Parents must be correct sex")
         assert.equal(this.parentFemale.sex, "female", "Parents must be correct sex")
 
-        // over 18
-        assert(this.parentMale.age > MIN_MARRIAGE_AGE,"Parents must be over 18")
-        assert(this.parentFemale.age > MIN_MARRIAGE_AGE,"Parents must be over 18")
+        // make sure they are both over 18
+        assert(this.parentMale.age > MIN_MARRIAGE_AGE, "Parents must be over 18")
+        assert(this.parentFemale.age > MIN_MARRIAGE_AGE, "Parents must be over 18")
 
         // already has a family?
         assert.notEqual(this.parentMale, this.parentMale.family?.parentMale, "Male parent already has a family")
@@ -45,12 +45,13 @@ export class Family {
         this.parentFemale.family = this;
     }
 
+    /** A function to decide weather or not the family should have a child
+     * 
+     * - higher probability of having a child if the family has fewer children
+     * - both parents are younger than 40 and alive
+     */
     shouldHaveChild(): number {
-        // return this.children.length < 3
-        // higher probability of having a child if the family has fewer children
-        // both parents are younger than 40 and alive
-
-        // alive?
+        // if one of them isn't alive, they can't reproduce
         if (!this.parentMale.alive || !this.parentFemale.alive) {
             return 0;
         }
@@ -73,9 +74,8 @@ export class Family {
             return 0;
         }
 
-        // todo: take into account nutrition, wealth, etc.
-
-        let probability = 1 / (this.children.length + 2);
+        // make fancy probability based on the number of children
+        const probability = 1 / (this.children.length + 2);
         return Math.random() < probability ? 1 : 0;
 
     }
@@ -86,6 +86,7 @@ export class Family {
         child.family = this;
     }
 
+    /** Uses the fathers surname to get the family name */
     get familyName() {
         return this.parentMale.name.split(' ').at(-1)
     }

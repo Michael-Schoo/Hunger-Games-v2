@@ -50,21 +50,13 @@ export default class Player {
 
         assert.equal(howAdjacent(this.location, [x,y]), 1, "The player must be only one degree of adjacency")
 
-        // this.currentTile.player = undefined
-        // tile.player = this
-        // this.currentTile = {...this.currentTile, player: undefined}
         this.map.setTile(...this.location, {player: undefined})
         this.map.setTile(x, y, {player: this})
         this.location = [x, y]
-        // this.currentTile = {...this.currentTile, player: this}
-        // todo: check if valid move (ie not too long + also check from player/district abilities
-
-
     }
 
     fight(opponent: Player, damage: number) {
         // check if opponent is adjacent
-
         const validFight = isValidFight(this, opponent)
         assert(validFight.valid, "player not adjacent, and can't fight")
 
@@ -85,8 +77,6 @@ export default class Player {
             opponent.kill()
             this.move(...opponent.location)
         }
-
-        // TODO: player fights back
 
     }
 

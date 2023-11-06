@@ -1,11 +1,11 @@
 import Person from "../people.js"
 import Player from "./player.js"
 import Game from "../game.js"
-import {convertMapToStr, makeCircleCords, makeMap} from "./map-utils.js"
+import { convertMapToStr, makeCircleCords, makeMap } from "./map-utils.js"
 import assert from "assert/strict";
-import {MapBiome, MapCord, MapTile} from "./map-types.js";
-import {getSmartMove, TurnAction} from "./find-moves.js";
-import {MAP_SIZE, mapConfig} from "../constants.js";
+import { MapBiome, MapCord, MapTile } from "./map-types.js";
+import { getSmartMove, TurnAction } from "./find-moves.js";
+import { MAP_SIZE, mapConfig } from "../constants.js";
 
 export class GameMap {
     readonly map: Map<MapCord, MapTile>
@@ -16,7 +16,6 @@ export class GameMap {
 
     constructor(players: Person[], game: Game) {
         this.game = game
-        // this.map = convertStrMapToActual(mapStr, mapConfig)
         this.map = makeMap()
 
         const mapEntries = [...this.map.entries()]
@@ -25,26 +24,16 @@ export class GameMap {
             .sort(() => Math.random() - 0.5);
 
         for (const person of players) {
-            if (!person) {
-                // console.info("No person")
-                continue
-            }
+            if (!person) continue
+
             const spawnPoint = spawnPoints.pop()
             assert(spawnPoint, "Should have spawn point to use")
 
+            // add the player to the map (in spawn point)
             const location = spawnPoint[0].split('-').map(n => parseInt(n)) as [number, number]
-            // console.log(location, spawnPoint)
-            // console.log(players)
-            // console.log(person.export())
             const player = new Player(person, this, location)
             this.players.push(player)
         }
-
-        // console.log(this.players.length)
-
-        // if (this.players.length !== districts.length * 2) {
-        //     throw new Error("Not enough spawn points")
-        // }
     }
 
     start() {
@@ -76,7 +65,7 @@ export class GameMap {
                 if (!tile) continue
 
                 if (goodTiles.find(([goodX, goodY]) => goodX === x && goodY === y)) continue
-                this.setTile(x, y, {redZone: Math.min((tile.redZone ?? Infinity), this.turn + 10)})
+                this.setTile(x, y, { redZone: Math.min((tile.redZone ?? Infinity), this.turn + 10) })
             }
         }
 
@@ -84,20 +73,16 @@ export class GameMap {
 
         for (const player of this.players) {
             if (player.person.diedAt !== null) {
-                // console.log(`Turn ${this.turn} (${this.game.year}): Ignoring ${player.person.name} at turn ${this.turn}`)
                 continue
             }
 
-            //? check valid moves
-            // const move = getRandomMove(this, player)
+            // get the move
             const move = getSmartMove(this, player)
 
-            if (!move) {
-                continue
-            } else {
-            }
+            // if indecisive, just do nothing
+            if (!move) continue 
 
-            // choose a move
+            // choose a move and action it
             if (move.action === TurnAction.Fight) {
                 player.fight(move.location.tile.player!, 10)
             } else if (move.action === TurnAction.Loot) {
@@ -123,16 +108,17 @@ export class GameMap {
             district.currentTurnActionWeightings = bestPlayer?.preferTurnAction
         }
 
+        // print the map if requested
         if (process.argv.includes('--print-map')) {
-            console.log(convertMapToStr(this, mapConfig, [this.game.year, this.turn  % MAP_SIZE]))
-            // Bun.sleepSync(100)
+            console.clear()
+            console.log(convertMapToStr(this, mapConfig, [this.game.year, this.turn % MAP_SIZE]))
         } else if (process.argv.includes('--debug-map')) {
             console.clear()
             console.log(`Year: ${this.game.year}, Turn: ${this.turn}`)
         }
 
         this.turn += 1;
-        if (!this.players.some(p=> p.person.alive)) {
+        if (!this.players.some(p => p.person.alive)) {
             console.log(`${this.game.year}: A game over in ${this.turn} turns`)
             this.gameOver = true
         }
@@ -154,7 +140,7 @@ export class GameMap {
     setTile(x: number, y: number, data: Partial<MapTile>) {
         const d = this.getTile(x, y)
 
-        this.map.set(`${x}-${y}`, {...d, ...data})
+        this.map.set(`${x}-${y}`, { ...d, ...data })
     }
 
 }

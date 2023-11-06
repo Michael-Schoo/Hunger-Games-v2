@@ -1,8 +1,9 @@
-import {GameMap} from "./map.js";
+import { GameMap } from "./map.js";
 import Player from "./player.js";
-import {MapTile} from "./map-types.js";
-import {pathfindingToClosestPlayer, pathfindToPoint} from "./pathfinding.js";
+import { MapTile } from "./map-types.js";
+import { pathfindingToClosestPlayer, pathfindToPoint } from "./pathfinding.js";
 
+/** The choice a player can do for moving */
 export enum MovementChoice {
     Up,
     Down,
@@ -11,6 +12,7 @@ export enum MovementChoice {
     None
 }
 
+/** The actual action the user will do */
 export enum TurnAction {
     Move,
     Fight,
@@ -19,23 +21,26 @@ export enum TurnAction {
     Loot,
 }
 
+/** Get a random move with no actual smarts */
 export function getRandomMove(map: GameMap, player: Player) {
     const validMoves = findValidMoves(map, player)
     return validMoves[Math.floor(Math.random() * validMoves.length)]
 }
 
+/** Use the player's weightings and choose action (and still use random) */
 export function getSmartMove(map: GameMap, player: Player) {
     let move: MovementChoice | null = null
 
-    // choose which action to do based on the user's weightings and random
-
-    // decide to fight
-    if (Math.random() <= (player.preferTurnAction[TurnAction.Fight] / 100)*6.5) {
+    // decide the action
+    if (Math.random() <= (player.preferTurnAction[TurnAction.Fight] / 100) * 6.5) {
+        // decide to fight
         move = pathfindingToClosestPlayer(map, player)
-    } else if (Math.random() <= (player.preferTurnAction[TurnAction.Move] / 10)*6.5) {
+
+    } else if (Math.random() <= (player.preferTurnAction[TurnAction.Move] / 10) * 6.5) {
+        // maybe move to random tile
         return getRandomMove(map, player)
-    } else if (Math.random() <= (player.preferTurnAction[TurnAction.Hide] / 10)*6.5) {
-        // decide to hide
+    } else if (Math.random() <= (player.preferTurnAction[TurnAction.Hide] / 10) * 6.5) {
+        // or possibly decide to hide
         return {
             choice: MovementChoice.None,
             action: TurnAction.Hide,
@@ -44,21 +49,24 @@ export function getSmartMove(map: GameMap, player: Player) {
                 tile: player.currentTile
             }
         }
-    } else if (Math.random() <= (player.preferTurnAction[TurnAction.Loot] / 100)*6.5) {
+    } else if (Math.random() <= (player.preferTurnAction[TurnAction.Loot] / 100) * 6.5) {
+        // or possibly decide to loot
         move = pathfindToPoint(map, player)
     }
+
+    // if no move, just do a random move
     if (!move) return getRandomMove(map, player)
 
-
+    // get the tile that is proposed to move into
     const cord = getCordAfterMove(player, move)
     const tile = map.getTile(...cord, false)
     if (!tile) return getRandomMove(map, player)
 
-    // todo edge case when it somehow bypasses from pathfinder
+    // some edge cases when it somehow bypasses from pathfinder, so just do a random move
     if (tile.player?.person.district === player.person.district) return getRandomMove(map, player)
-    // todo, somehow the tile is still there even if dead?
     if (tile.player?.hp !== 0 && !tile.player?.person.alive) return getRandomMove(map, player)
 
+    // return the move data
     return {
         choice: move,
         action: tile.player ? TurnAction.Fight : TurnAction.Move,
@@ -71,8 +79,8 @@ export function getSmartMove(map: GameMap, player: Player) {
 
 }
 
+/** Respect the map and fighting decision, but just randomly decide on action later */
 export default function findValidMoves(map: GameMap, player: Player, allowFighting = false) {
-    const [playerX, playerY] = player.location
     const moves = [
         MovementChoice.Up,
         MovementChoice.Down,
@@ -95,8 +103,8 @@ export default function findValidMoves(map: GameMap, player: Player, allowFighti
         const tileCord = getCordAfterMove(player, move)
         const tile = map.map.get(`${tileCord[0]}-${tileCord[1]}`)
 
+        // if the tile doesn't exist, don't bother going there
         if (!tile) {
-            // console.log("tile does not exist", tileCord)
             continue
         }
 
@@ -106,20 +114,22 @@ export default function findValidMoves(map: GameMap, player: Player, allowFighti
             }
 
             if (tile.player.person.district === player.person.district) {
-                // console.log("same district")
                 continue
             }
 
+            // really make sure it is a valid fight and ajacent
             const testValid = isValidFight(player, tile.player)
             if (!testValid.valid) {
                 console.log("not valid location to actually fight")
                 continue
             }
 
+            // if the player is dead, don't bother
             if (tile.player.hp === 0 || !tile.player.person.alive) {
                 continue
             }
 
+            // push the valid move to list
             validMoves.push({
                 choice: move,
                 action: TurnAction.Fight,
@@ -130,6 +140,7 @@ export default function findValidMoves(map: GameMap, player: Player, allowFighti
                 }
             })
         } else {
+            // they don't want to fight so just move
             validMoves.push({
                 choice: move,
                 action: TurnAction.Move,
@@ -146,6 +157,7 @@ export default function findValidMoves(map: GameMap, player: Player, allowFighti
 
 }
 
+/** Uses the movement choices and works out the new coordinate  */
 export function getCordAfterMove(player: Player, choice: MovementChoice) {
     const newCords = structuredClone(player.location)
     switch (choice) {
@@ -161,14 +173,16 @@ export function getCordAfterMove(player: Player, choice: MovementChoice) {
         case MovementChoice.Right:
             newCords[1] += 1
             break;
+        case MovementChoice.None:
+            break;
         default:
-        // move satisfies never
-        // throw new Error("not a move")
+            choice satisfies never
+            throw new Error("not a move")
     }
     return newCords
 }
 
-
+/** Work out how many turns it will take to get to a certain coordinate */
 export function howAdjacent(coordinateA: [number, number], coordinateB: [number, number]): number {
     let xDistance = Math.abs(coordinateA[0] - coordinateB[0]);
     let yDistance = Math.abs(coordinateA[1] - coordinateB[1]);
@@ -191,6 +205,7 @@ export function howAdjacent(coordinateA: [number, number], coordinateB: [number,
     }
 }
 
+/** Checks if the player is adjacent because fighting is only that */
 export function isValidFight(fighter: Player, opponent: Player) {
 
     const [thisX, thisY] = fighter.location
@@ -201,6 +216,6 @@ export function isValidFight(fighter: Player, opponent: Player) {
     const isLeft = (thisX === fightX) && (thisY - 1 === fightY)
     const isRight = (thisX === fightX) && (thisY + 1 === fightY)
 
-    return {isUp, isDown, isLeft, isRight, valid: isUp || isDown || isLeft || isRight}
+    return { isUp, isDown, isLeft, isRight, valid: isUp || isDown || isLeft || isRight }
 
 }

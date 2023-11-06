@@ -4,11 +4,6 @@ export type Sex = "male" | "female"
 
 export interface Learboard {
     district: District
-    malePosition: number
-    femalePosition: number
-    // aggregated from malePosition and femalePosition
+    // the top position of the leaderboard
     position: number
-
-    maleLasted: number
-    femaleLasted: number
 }

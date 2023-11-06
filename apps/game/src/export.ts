@@ -29,7 +29,7 @@ export type ExportedLeaderboard = Record<number, Learboard>
 
 export interface BasicStats {
     lastYear: number
-    
+
 }
 
 export interface ExportedData {
@@ -38,4 +38,3 @@ export interface ExportedData {
     leaderboard: ExportedLeaderboard
     families: ExportedFamilies
 }
-
