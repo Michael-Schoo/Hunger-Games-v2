@@ -50,7 +50,7 @@ jobs:
         name: Restore cache (nextjs)
         uses: actions/cache@v3
         with:
-          path: .apps/visualization/.next/cache
+          path: ./apps/visualization/.next/cache
           # Generate a new cache whenever packages or source files change.
           key: ${{ runner.os }}-nextjs-${{ hashFiles('**/bun.lockb') }}-${{ hashFiles('./apps/visualization/**.[jt]s', './apps/visualization/**.[jt]sx') }}
           # If source files changed but packages didn't, rebuild from a prior cache.
