@@ -1,6 +1,5 @@
 "use client";
 
-// @ts-ignore
 import { InformationCircleIcon } from "@heroicons/react/solid";
 
 import {
@@ -12,11 +11,7 @@ import {
   LineChart,
   LineChartProps,
 } from "@tremor/react";
-import { useState } from "react";
-import { ExportedData, useData } from "./lib/get-data";
-import Loading from "./components/loading";
-import PeopleList from "@/app/people-list.client";
-
+import { ExportedData, useData } from "../lib/get-data";
 
 
 function formatAge(people: ExportedData["people"]) {
@@ -53,13 +48,6 @@ function formatAge(people: ExportedData["people"]) {
     result.push({ age: Number(key), ...value });
   }
 
-  // // make sure there is each age (even if 0) and include to the 10s colum (min age 39 = 30 age included)
-  // for (let i = 0; i < 100; i += 10) {
-  //   if (!result.find((item) => item.age === i)) {
-  //     result.push({ age: i, ...{ "District 1": 0, "District 2": 0, "District 3": 0, "District 4": 0, "District 5": 0, "District 6": 0, "District 7": 0, "District 8": 0, "District 9": 0, "District 10": 0, "District 11": 0, "District 12": 0 } })
-  //   }
-  // }
-
   // sort by age
   return result.sort((a, b) => a.age - b.age);
   // return result;
@@ -89,46 +77,36 @@ export default function AgeGraph() {
 
 
   return (
-            <div className="mt-6">
-              <Card>
-                <>
-                  <div className="md:flex justify-between">
-                    <div>
-                      <Flex className="space-x-0.5" justifyContent="start" alignItems="center">
-                        <Title>Age distribution</Title>
-                        <Icon
-                          icon={InformationCircleIcon}
-                          variant="simple"
-                          tooltip="Shows the age distribution grouped by districts"
-                        />
-                      </Flex>
-                      <Text>The age distribution grouped by districts for the end of the game</Text>
-                    </div>
-                    {/* <div>
-                      <TabGroup index={selectedIndex} onIndexChange={setSelectedIndex}>
-                        <TabList color="gray" variant="solid">
-                          <Tab>Sales</Tab>
-                          <Tab>Profit</Tab>
-                          <Tab>Customers</Tab>
-                        </TabList>
-                      </TabGroup>
-                    </div> */}
-                  </div>
-                  {/* web */}
-                  <div className="mt-8 hidden sm:block">
-                    <LineChart {...ageChartArgs} />
-                  </div>
-                  {/* mobile */}
-                  <div className="mt-8 sm:hidden">
-                    <LineChart
-                      {...ageChartArgs}
-                      startEndOnly={true}
-                      showGradient={false}
-                      showYAxis={false}
-                    />
-                  </div>
-                </>
-              </Card>
+    <div className="mt-6">
+      <Card>
+        <>
+          <div className="md:flex justify-between">
+            <div>
+              <Flex className="space-x-0.5" justifyContent="start" alignItems="center">
+                <Title>Age distribution</Title>
+                <Icon
+                  icon={InformationCircleIcon}
+                  variant="simple"
+                  tooltip="Shows the age distribution grouped by districts"
+                />
+              </Flex>
+              <Text>The age distribution grouped by districts for the end of the game</Text>
             </div>
+          </div>
+          {/* web */}
+          <div className="mt-8 hidden sm:block">
+            <LineChart {...ageChartArgs} />
+          </div>
+          {/* mobile */}
+          <div className="mt-8 sm:hidden">
+            <LineChart
+              {...ageChartArgs}
+              startEndOnly={true}
+              showYAxis={false}
+            />
+          </div>
+        </>
+      </Card>
+    </div>
   );
 }

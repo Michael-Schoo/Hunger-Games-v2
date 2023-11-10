@@ -1,6 +1,5 @@
 "use client";
 
-// @ts-ignore
 import { InformationCircleIcon } from "@heroicons/react/solid";
 
 import {
@@ -12,11 +11,7 @@ import {
   LineChart,
   LineChartProps,
 } from "@tremor/react";
-import { useState } from "react";
-import { ExportedData, useData } from "./lib/get-data";
-import Loading from "./components/loading";
-import PeopleList from "@/app/people-list.client";
-
+import { ExportedData, useData } from "../lib/get-data";
 
 
 function formatAge(people: ExportedData["people"]) {
@@ -89,22 +84,22 @@ export default function AgeGraph() {
 
 
   return (
-            <div className="mt-6">
-              <Card>
-                <>
-                  <div className="md:flex justify-between">
-                    <div>
-                      <Flex className="space-x-0.5" justifyContent="start" alignItems="center">
-                        <Title>Age distribution</Title>
-                        <Icon
-                          icon={InformationCircleIcon}
-                          variant="simple"
-                          tooltip="Shows the age distribution grouped by districts"
-                        />
-                      </Flex>
-                      <Text>The age distribution grouped by districts for the end of the game</Text>
-                    </div>
-                    {/* <div>
+    <div className="mt-6">
+      <Card>
+        <>
+          <div className="md:flex justify-between">
+            <div>
+              <Flex className="space-x-0.5" justifyContent="start" alignItems="center">
+                <Title>Age distribution</Title>
+                <Icon
+                  icon={InformationCircleIcon}
+                  variant="simple"
+                  tooltip="Shows the age distribution grouped by districts"
+                />
+              </Flex>
+              <Text>The age distribution grouped by districts for the end of the game</Text>
+            </div>
+            {/* <div>
                       <TabGroup index={selectedIndex} onIndexChange={setSelectedIndex}>
                         <TabList color="gray" variant="solid">
                           <Tab>Sales</Tab>
@@ -113,22 +108,21 @@ export default function AgeGraph() {
                         </TabList>
                       </TabGroup>
                     </div> */}
-                  </div>
-                  {/* web */}
-                  <div className="mt-8 hidden sm:block">
-                    <LineChart {...ageChartArgs} />
-                  </div>
-                  {/* mobile */}
-                  <div className="mt-8 sm:hidden">
-                    <LineChart
-                      {...ageChartArgs}
-                      startEndOnly={true}
-                      showGradient={false}
-                      showYAxis={false}
-                    />
-                  </div>
-                </>
-              </Card>
-            </div>
+          </div>
+          {/* web */}
+          <div className="mt-8 hidden sm:block">
+            <LineChart {...ageChartArgs} />
+          </div>
+          {/* mobile */}
+          <div className="mt-8 sm:hidden">
+            <LineChart
+              {...ageChartArgs}
+              startEndOnly={true}
+              showYAxis={false}
+            />
+          </div>
+        </>
+      </Card>
+    </div>
   );
 }

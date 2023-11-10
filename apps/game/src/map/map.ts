@@ -1,7 +1,7 @@
 import Person from "../people.js"
 import Player from "./player.js"
 import Game from "../game.js"
-import { convertMapToStr, makeCircleCords, makeMap } from "./map-utils.js"
+import { printMap, makeCircleCords, makeMap } from "./map-utils.js"
 import assert from "assert/strict";
 import { MapBiome, MapCord, MapTile } from "./map-types.js";
 import { getSmartMove, TurnAction } from "./find-moves.js";
@@ -110,8 +110,11 @@ export class GameMap {
 
         // print the map if requested
         if (process.argv.includes('--print-map')) {
-            console.clear()
-            console.log(convertMapToStr(this, mapConfig, [this.game.year, this.turn % MAP_SIZE]))
+            // console.clear();
+            printMap(this, mapConfig, [this.game.year, this.turn % MAP_SIZE])
+            // @ts-ignore Web app doesn't like this
+            Bun.sleepSync(2500)
+            console.log('\n\n\n\n\n')
         } else if (process.argv.includes('--debug-map')) {
             console.clear()
             console.log(`Year: ${this.game.year}, Turn: ${this.turn}`)
@@ -130,7 +133,7 @@ export class GameMap {
     getTile(x: number, y: number, required = true) {
         const tile = this.map.get(`${x}-${y}`)
         if (!tile && required) {
-            console.log(convertMapToStr(this, mapConfig, [x, y]))
+            console.log(printMap(this, mapConfig, [x, y]))
         }
 
         if (required) assert(tile, `Tile (${x}, ${y}) is not a valid tile`)

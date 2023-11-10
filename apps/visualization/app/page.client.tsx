@@ -11,11 +11,11 @@ import {
 } from "@tremor/react";
 import { useData } from "./lib/get-data";
 import Loading from "./components/loading";
-import PeopleList from "@/app/people-list.client";
-import AgeGraph from "@/app/age-graph.client";
+import PeopleList from "@/app/people/people-list.client";
+import AgeGraph from "@/app/overview/age-graph.client";
 
 
-export default function DashboardExample() {
+export default function Dashboard() {
   const data = useData()
 
   const isLoading = data.isLoading
@@ -31,8 +31,8 @@ export default function DashboardExample() {
 
   return (
     <main className="p-6 sm:p-10">
-      <Title>Dashboard</Title>
-      <Text>Lorem ipsum dolor sit amet, consetetur sadipscing elitr.</Text>
+      <Title>Hunger Games Simulation</Title>
+      <Text>Data stats for a run of the game.</Text>
 
       <TabGroup className="mt-6">
         <TabList>

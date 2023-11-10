@@ -1,6 +1,5 @@
 "use client";
 
-// @ts-ignore
 import { InformationCircleIcon } from "@heroicons/react/solid";
 
 import {
@@ -13,7 +12,7 @@ import {
   LineChartProps,
 } from "@tremor/react";
 import { useState } from "react";
-import { ExportedData, useData } from "./lib/get-data";
+import { ExportedData, useData } from "../lib/get-data";
 
 function formatAge(people: ExportedData["people"]) {
   // Assuming the data is an array of objects with district and age properties
@@ -33,7 +32,7 @@ function formatAge(people: ExportedData["people"]) {
       intermediate[age][`District ${district}`] = (intermediate[age][`District ${district}`] || 0) + 1;
     } else {
       // If not, create a new property with the age value and assign an object with the district and count of one
-      intermediate[age] = {[`District ${district}`]: 1};
+      intermediate[age] = { [`District ${district}`]: 1 };
     }
   }
 
@@ -46,7 +45,7 @@ function formatAge(people: ExportedData["people"]) {
     let value = intermediate[key];
 
     // Add a new object to the result array with the age and district properties
-    result.push({age: Number(key), ...value});
+    result.push({ age: Number(key), ...value });
   }
 
   // sort by age
@@ -77,22 +76,22 @@ export default function PopulationGraph() {
 
 
   return (
-            <div className="mt-6">
-              <Card>
-                <>
-                  <div className="md:flex justify-between">
-                    <div>
-                      <Flex className="space-x-0.5" justifyContent="start" alignItems="center">
-                        <Title>Age distribution</Title>
-                        <Icon
-                          icon={InformationCircleIcon}
-                          variant="simple"
-                          tooltip="Shows the age distribution grouped by districts"
-                        />
-                      </Flex>
-                      <Text>The age distribution grouped by districts for the end of the game</Text>
-                    </div>
-                    {/* <div>
+    <div className="mt-6">
+      <Card>
+        <>
+          <div className="md:flex justify-between">
+            <div>
+              <Flex className="space-x-0.5" justifyContent="start" alignItems="center">
+                <Title>Age distribution</Title>
+                <Icon
+                  icon={InformationCircleIcon}
+                  variant="simple"
+                  tooltip="Shows the age distribution grouped by districts"
+                />
+              </Flex>
+              <Text>The age distribution grouped by districts for the end of the game</Text>
+            </div>
+            {/* <div>
                       <TabGroup index={selectedIndex} onIndexChange={setSelectedIndex}>
                         <TabList color="gray" variant="solid">
                           <Tab>Sales</Tab>
@@ -101,22 +100,21 @@ export default function PopulationGraph() {
                         </TabList>
                       </TabGroup>
                     </div> */}
-                  </div>
-                  {/* web */}
-                  <div className="mt-8 hidden sm:block">
-                    <LineChart {...ageChartArgs} />
-                  </div>
-                  {/* mobile */}
-                  <div className="mt-8 sm:hidden">
-                    <LineChart
-                      {...ageChartArgs}
-                      startEndOnly={true}
-                      showGradient={false}
-                      showYAxis={false}
-                    />
-                  </div>
-                </>
-              </Card>
-            </div>
+          </div>
+          {/* web */}
+          <div className="mt-8 hidden sm:block">
+            <LineChart {...ageChartArgs} />
+          </div>
+          {/* mobile */}
+          <div className="mt-8 sm:hidden">
+            <LineChart
+              {...ageChartArgs}
+              startEndOnly={true}
+              showYAxis={false}
+            />
+          </div>
+        </>
+      </Card>
+    </div>
   );
 }

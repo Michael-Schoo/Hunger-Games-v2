@@ -34,6 +34,9 @@
     "**/*.tsx",
     ".next/types/**/*.ts"
   ],
+  "types": [
+    "bun-types"
+  ],
   "exclude": [
     "node_modules"
   ]

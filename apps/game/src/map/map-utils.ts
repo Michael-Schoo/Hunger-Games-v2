@@ -143,11 +143,12 @@ export function* makeCircleCords(size = 100, R = 50, ring = false, centerCord?: 
 
 
 /** Turns a map into a printable visualization */
-export function convertMapToStr(map: GameMap, mapConfig: MapBiomeConfig, highlight?: [number, number]) {
+export function printMap(map: GameMap, mapConfig: MapBiomeConfig, highlight?: [number, number]) {
     const [maxX, maxY] = mapSize(map.map)
     let msg = ''
 
     for (const x of range({ start: 1, end: maxX + 1 })) {
+        let line = ''
         for (const y of range({ start: 1, end: maxY + 1 })) {
             // get the actual entry here
             const entry = map.map.get(`${x}-${y}`)
@@ -160,12 +161,16 @@ export function convertMapToStr(map: GameMap, mapConfig: MapBiomeConfig, highlig
             if ((highlight?.[0] === x || highlight?.[1] === y)) emoji = pc.bgYellow(emoji)
             if ((entry?.redZone || Infinity) <= map.turn) emoji = pc.bgRed(emoji)
             if (entry?.redZone) emoji = pc.bgMagenta(emoji)
-
-            msg += `${emoji}`
+            
+            process.stdout.write(emoji)
+            line += `${emoji}`
         }
-        msg += '\n'
+
+        process.stdout.write('\n')
+        msg += line + '\n'
     }
 
-    return msg
+    // return 
+    return ''
 
 }
