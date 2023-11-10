@@ -1,7 +1,7 @@
 import {MapBiomeConfig, MapBiome} from "./map/map-types.js";
 
 /** How many people are generated in each district initially */
-export const INITIAL_PEOPLE_PER_DISTRICT = 100_000;
+export const INITIAL_PEOPLE_PER_DISTRICT = 1000;
 
 /** How many years to run */
 export const YEARS_TO_SIMULATE = 100;
