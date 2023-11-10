@@ -98,14 +98,14 @@ export class GameMap {
 
         }
 
+        const bestPlayers = this.players.sort((a, b) => (a.person.diedAt ?? Infinity) - (b.person.diedAt ?? Infinity))
+
         // get the best player in each district
         for (const district of this.game.districts) {
             // save the best player's stats
-            const bestPlayer = this.players
-                .filter(p => p.person.district === district)
-                .sort((a, b) => (a.person.diedAt ?? Infinity) - (b.person.diedAt ?? Infinity))[0]
-
+            const bestPlayer = bestPlayers.filter(p => p.person.district === district)[0]
             district.currentTurnActionWeightings = bestPlayer?.preferTurnAction
+            // console.log(district.name+JSON.stringify(district.currentTurnActionWeightings))
         }
 
         // print the map if requested

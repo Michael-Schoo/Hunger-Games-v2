@@ -4,7 +4,7 @@ import {MapBiomeConfig, MapBiome} from "./map/map-types.js";
 export const INITIAL_PEOPLE_PER_DISTRICT = 1000;
 
 /** How many years to run */
-export const YEARS_TO_SIMULATE = 100;
+export const YEARS_TO_SIMULATE = 50;
 
 export const MIN_FIGHT_AGE = 14;
 export const MIN_MARRIAGE_AGE = 18;
