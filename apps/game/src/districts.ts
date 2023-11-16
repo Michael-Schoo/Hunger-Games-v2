@@ -1,6 +1,6 @@
 import Game from "./game.js";
+import { TurnAction } from "./map/map-types.js";
 import Person from "./people.js";
-import { TurnAction } from "./map/find-moves.js";
 
 export interface DistrictProps {
     // name: string,
@@ -51,6 +51,9 @@ export default class District {
 
         });
     }
+
+    /**  */
+    readonly leaderboard: Record<number, number> = {};
 
 }
 

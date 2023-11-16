@@ -2,8 +2,8 @@ import { GameMap } from "./map.js";
 import Player from "./player.js";
 import { makeCircleCords } from "./map-utils.js";
 import { MAP_SIZE } from "../constants.js";
-import { MapBiome, MapTile } from "./map-types.js";
-import { getCordAfterMove, howAdjacent, MovementChoice, TurnAction } from "./find-moves.js";
+import { MapBiome, MapTile, MovementChoice } from "./map-types.js";
+import { getCordAfterMove, howAdjacent } from "./find-moves.js";
 
 
 /** Only gives the minimap for a certain radius */

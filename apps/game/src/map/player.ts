@@ -3,8 +3,8 @@ import Game from "../game.js";
 import Person from "../people.js";
 import {round} from "../utils.js";
 import assert from "assert/strict";
-import {howAdjacent, isValidFight, TurnAction} from "./find-moves.js";
-import {MapBiome, MapTile} from "./map-types.js";
+import {howAdjacent, isValidFight} from "./find-moves.js";
+import {MapBiome, MapTile, TurnAction} from "./map-types.js";
 import {YEARS_TO_SIMULATE} from "../constants.js";
 import {makeRandomStats} from "./decide-random-action-stat.js";
 

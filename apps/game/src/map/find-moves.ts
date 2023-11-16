@@ -1,25 +1,9 @@
 import { GameMap } from "./map.js";
 import Player from "./player.js";
-import { MapTile } from "./map-types.js";
+import { MapTile, MovementChoice, TurnAction } from "./map-types.js";
 import { pathfindingToClosestPlayer, pathfindToPoint } from "./pathfinding.js";
 
-/** The choice a player can do for moving */
-export enum MovementChoice {
-    Up,
-    Down,
-    Left,
-    Right,
-    None
-}
 
-/** The actual action the user will do */
-export enum TurnAction {
-    Move,
-    Fight,
-    Pass,
-    Hide,
-    Loot,
-}
 
 /** Get a random move with no actual smarts */
 export function getRandomMove(map: GameMap, player: Player) {

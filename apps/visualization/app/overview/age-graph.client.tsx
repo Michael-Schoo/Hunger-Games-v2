@@ -12,6 +12,7 @@ import {
   LineChartProps,
 } from "@tremor/react";
 import { ExportedData, useData } from "../lib/get-data";
+import { districtNames, districtColors } from "./utils";
 
 
 function formatAge(people: ExportedData["people"]) {
@@ -21,10 +22,10 @@ function formatAge(people: ExportedData["people"]) {
   let intermediate = {} as Record<string, Record<string, number>>;
 
   // Loop through the data array
-  for (let item of people) {
+  for (const item of people) {
     // Get the district and age values of the current item
-    let district = item.district;
-    let age = item.age;
+    const district = item.district;
+    const age = item.age;
 
     // Check if the intermediate object already has a property with the age value
     if (intermediate.hasOwnProperty(age)) {
@@ -37,7 +38,7 @@ function formatAge(people: ExportedData["people"]) {
   }
 
   // Initialize an empty array to store the final result
-  let result = [];
+  const result = [];
 
   // Loop through the intermediate object
   for (let key in intermediate) {
@@ -68,8 +69,8 @@ export default function AgeGraph() {
     // data.data!.people is the array of people with age and district as props
     data: formatAge(data.data!.people),
     index: "age",
-    categories: ["District 1", "District 2", "District 3", "District 4", "District 5", "District 6", "District 7", "District 8", "District 9", "District 10", "District 11", "District 12"],
-    colors: ["red", "orange", "amber", "yellow", "lime", "green", "emerald", "teal", "cyan", "sky", "blue", "indigo"],
+    categories: districtNames,
+    colors: districtColors,
     showLegend: false,
     valueFormatter: (value) => `${value} people`,
     yAxisWidth: 56,

@@ -25,7 +25,7 @@ export type ExportedFamilies = Record<number, ExportedFamily[]>
 /** Key: district number */
 export type ExportedDistrictCensus = Record<number, DistrictCensus[]>
 /** Key: year number */
-export type ExportedLeaderboard = Record<number, Learboard>
+export type ExportedLeaderboard = Learboard[]
 
 export interface BasicStats {
     lastYear: number

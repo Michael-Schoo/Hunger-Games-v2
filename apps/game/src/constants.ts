@@ -6,6 +6,7 @@ export const INITIAL_PEOPLE_PER_DISTRICT = 1000;
 /** How many years to run */
 export const YEARS_TO_SIMULATE = 50;
 
+// Age settings
 export const MIN_FIGHT_AGE = 14;
 export const MIN_MARRIAGE_AGE = 18;
 export const MIN_CHILD_BEARING_AGE = 18;

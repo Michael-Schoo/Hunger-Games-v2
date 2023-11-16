@@ -10,65 +10,59 @@ import {
   Icon,
   LineChart,
   LineChartProps,
+  Tab,
+  TabGroup,
+  TabList,
 } from "@tremor/react";
 import { useState } from "react";
 import { ExportedData, useData } from "../lib/get-data";
+import { districtColors, districtNames } from "./utils";
 
-function formatAge(people: ExportedData["people"]) {
-  // Assuming the data is an array of objects with district and age properties
+function formatPopulation(census: ExportedData["districtCensus"], key: string) {
+  const result = [] as Record<string, number>[] & { Year: number }[]
+  const keyy = key.toLowerCase() as 'population' | 'deaths' | 'births'
 
-  // Initialize an empty object to store the intermediate result
-  let intermediate = {} as Record<string, Record<string, number>>;
+  // census is keyed by district
+  // so we need to loop through each district
+  for (const district in census) {
+    const districtCensus = census[district]
 
-  // Loop through the data array
-  for (let item of people) {
-    // Get the district and age values of the current item
-    let district = item.district;
-    let age = item.age;
-
-    // Check if the intermediate object already has a property with the age value
-    if (intermediate.hasOwnProperty(age)) {
-      // If yes, increment the count of the district by one
-      intermediate[age][`District ${district}`] = (intermediate[age][`District ${district}`] || 0) + 1;
-    } else {
-      // If not, create a new property with the age value and assign an object with the district and count of one
-      intermediate[age] = { [`District ${district}`]: 1 };
+    // and then each year
+    for (const { year, [keyy]: value } of districtCensus) {
+      // and add it to the result
+      const districtResult = result.find((r) => r.Year === year)
+      if (districtResult) {
+        districtResult[`District ${district}`] = value
+      } else {
+        result.push({ Year: year, [`District ${district}`]: value })
+      }
     }
   }
 
-  // Initialize an empty array to store the final result
-  let result = [];
+  return result
 
-  // Loop through the intermediate object
-  for (let key in intermediate) {
-    // Get the value of the current key
-    let value = intermediate[key];
-
-    // Add a new object to the result array with the age and district properties
-    result.push({ age: Number(key), ...value });
-  }
-
-  // sort by age
-  return result.sort((a, b) => a.age - b.age);
-  // return result;
 }
 
+const keys = ['population', 'deaths', 'births']
+
 export default function PopulationGraph() {
+
+  const [selectedIndex, setSelectedIndex] = useState<number>(1)
+
   const data = useData()
 
   if (data.isLoading || !data.data || data.error) return
 
 
+
   const ageChartArgs: LineChartProps = {
     className: "mt-5 h-72",
     // 12 lines (the districts)
-    // each age has a value for each district - it is in the same dict
-    // ie age 50 has dict of { district1: 1, district2: 2, ... }
-    // data.data!.people is the array of people with age and district as props
-    data: formatAge(data.data!.people),
-    index: "age",
-    categories: ["District 1", "District 2", "District 3", "District 4", "District 5", "District 6", "District 7", "District 8", "District 9", "District 10", "District 11", "District 12"],
-    colors: ["red", "orange", "amber", "yellow", "lime", "green", "emerald", "teal", "cyan", "sky", "blue", "indigo"],
+    // each year is a column
+    data: formatPopulation(data.data.districtCensus, keys[selectedIndex]),
+    index: "Year",
+    categories: districtNames,
+    colors: districtColors,
     showLegend: false,
     valueFormatter: (value) => `${value} people`,
     yAxisWidth: 56,
@@ -82,24 +76,28 @@ export default function PopulationGraph() {
           <div className="md:flex justify-between">
             <div>
               <Flex className="space-x-0.5" justifyContent="start" alignItems="center">
-                <Title>Age distribution</Title>
+                <Title>People census</Title>
                 <Icon
                   icon={InformationCircleIcon}
                   variant="simple"
-                  tooltip="Shows the age distribution grouped by districts"
+                  tooltip="Shows the data grouped by year"
                 />
               </Flex>
-              <Text>The age distribution grouped by districts for the end of the game</Text>
+              <Text>The amount of people who {
+                selectedIndex == 0 ? "exist" :
+                  selectedIndex == 1 ? "are born" 
+                  : "die"
+                } year</Text>
             </div>
-            {/* <div>
-                      <TabGroup index={selectedIndex} onIndexChange={setSelectedIndex}>
-                        <TabList color="gray" variant="solid">
-                          <Tab>Sales</Tab>
-                          <Tab>Profit</Tab>
-                          <Tab>Customers</Tab>
-                        </TabList>
-                      </TabGroup>
-                    </div> */}
+            <div>
+              <TabGroup index={selectedIndex} onIndexChange={setSelectedIndex}>
+                <TabList variant="solid">
+                  <Tab>Population</Tab>
+                  <Tab>Deaths</Tab>
+                  <Tab>Births</Tab>
+                </TabList>
+              </TabGroup>
+            </div>
           </div>
           {/* web */}
           <div className="mt-8 hidden sm:block">

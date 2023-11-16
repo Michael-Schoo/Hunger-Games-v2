@@ -41,3 +41,21 @@ export type MapTile = {
     /** how many turns left until it kills you (if 0 and player on it, death) */
     redZone?: number
 }
+
+/** The choice a player can do for moving */
+export enum MovementChoice {
+    Up,
+    Down,
+    Left,
+    Right,
+    None
+}
+
+/** The actual action the user will do */
+export enum TurnAction {
+    Move,
+    Fight,
+    Pass,
+    Hide,
+    Loot,
+}

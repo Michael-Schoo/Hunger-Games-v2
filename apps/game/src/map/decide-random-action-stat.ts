@@ -1,4 +1,4 @@
-import { TurnAction } from "./find-moves.js";
+import { TurnAction } from "./map-types.js"
 
 const TOTAL_STAT_VALUE = 20
 const MIN_STAT_VALUE = 1

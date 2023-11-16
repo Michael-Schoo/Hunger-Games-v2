@@ -3,9 +3,10 @@ import Player from "./player.js"
 import Game from "../game.js"
 import { printMap, makeCircleCords, makeMap } from "./map-utils.js"
 import assert from "assert/strict";
-import { MapBiome, MapCord, MapTile } from "./map-types.js";
-import { getSmartMove, TurnAction } from "./find-moves.js";
+import { MapBiome, MapCord, MapTile, TurnAction } from "./map-types.js";
+import { getSmartMove } from "./find-moves.js";
 import { MAP_SIZE, mapConfig } from "../constants.js";
+import District from "../districts.js";
 
 export class GameMap {
     readonly map: Map<MapCord, MapTile>
@@ -39,6 +40,32 @@ export class GameMap {
     start() {
         while (!this.gameOver) {
             this.newTurn()
+        }
+
+        // get the best players in each district
+        const bestPlayers = this.players.sort((a, b) => (a.person.diedAt ?? Infinity) - (b.person.diedAt ?? Infinity))
+        const districtsMentioned = [] as District[]
+        const bestPlayerss = [] as Player[]
+        
+        for (const player of bestPlayers) {
+            if (player.person.diedAt === null) continue
+            if (districtsMentioned.includes(player.person.district)) continue
+            districtsMentioned.push(player.person.district)
+            bestPlayerss.push(player)
+        }
+
+        // get the best player in each district
+        for (const district of this.game.districts) {
+            // save the best player's stats
+            const bestPlayer = bestPlayerss.filter(p => p.person.district === district)[0]
+            district.currentTurnActionWeightings = bestPlayer?.preferTurnAction
+
+            // add pos
+            this.game.learboards.push({
+                district: district.type,
+                position: bestPlayerss.indexOf(bestPlayer) + 1,
+                year: this.game.year
+            })
         }
     }
 
@@ -80,7 +107,7 @@ export class GameMap {
             const move = getSmartMove(this, player)
 
             // if indecisive, just do nothing
-            if (!move) continue 
+            if (!move) continue
 
             // choose a move and action it
             if (move.action === TurnAction.Fight) {
@@ -98,15 +125,6 @@ export class GameMap {
 
         }
 
-        const bestPlayers = this.players.sort((a, b) => (a.person.diedAt ?? Infinity) - (b.person.diedAt ?? Infinity))
-
-        // get the best player in each district
-        for (const district of this.game.districts) {
-            // save the best player's stats
-            const bestPlayer = bestPlayers.filter(p => p.person.district === district)[0]
-            district.currentTurnActionWeightings = bestPlayer?.preferTurnAction
-            // console.log(district.name+JSON.stringify(district.currentTurnActionWeightings))
-        }
 
         // print the map if requested
         if (process.argv.includes('--print-map')) {

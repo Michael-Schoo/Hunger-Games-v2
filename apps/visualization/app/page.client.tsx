@@ -13,6 +13,9 @@ import { useData } from "./lib/get-data";
 import Loading from "./components/loading";
 import PeopleList from "@/app/people/people-list.client";
 import AgeGraph from "@/app/overview/age-graph.client";
+import ActionsGraph from "./overview/actions-graph.client";
+import PopulationGraph from "./overview/population-graph.client";
+import LeaderboardGraph from "./overview/leaderboard";
 
 
 export default function Dashboard() {
@@ -43,6 +46,9 @@ export default function Dashboard() {
           {/* Graphs */}
           <TabPanel>
             <AgeGraph />
+            <ActionsGraph />
+            <PopulationGraph />
+            <LeaderboardGraph />
           </TabPanel>
 
           {/* People List */}
