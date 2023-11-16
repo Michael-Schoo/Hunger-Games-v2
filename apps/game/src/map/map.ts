@@ -43,10 +43,10 @@ export class GameMap {
         }
 
         // get the best players in each district
-        const bestPlayers = this.players.sort((a, b) => (a.person.diedAt ?? Infinity) - (b.person.diedAt ?? Infinity))
+        const bestPlayers = this.players.sort((a, b) => (a.diedAtTurn ?? Infinity) - (b.diedAtTurn ?? Infinity))
         const districtsMentioned = [] as District[]
         const bestPlayerss = [] as Player[]
-        
+
         for (const player of bestPlayers) {
             if (player.person.diedAt === null) continue
             if (districtsMentioned.includes(player.person.district)) continue

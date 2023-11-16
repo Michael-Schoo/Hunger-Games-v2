@@ -1,12 +1,12 @@
-import {GameMap} from "./map.js";
+import { GameMap } from "./map.js";
 import Game from "../game.js";
 import Person from "../people.js";
-import {round} from "../utils.js";
+import { round } from "../utils.js";
 import assert from "assert/strict";
-import {howAdjacent, isValidFight} from "./find-moves.js";
-import {MapBiome, MapTile, TurnAction} from "./map-types.js";
-import {YEARS_TO_SIMULATE} from "../constants.js";
-import {makeRandomStats} from "./decide-random-action-stat.js";
+import { howAdjacent, isValidFight } from "./find-moves.js";
+import { MapTile, TurnAction } from "./map-types.js";
+import { YEARS_TO_SIMULATE } from "../constants.js";
+import { makeRandomStats } from "./decide-random-action-stat.js";
 
 export default class Player {
     readonly person: Person;
@@ -14,7 +14,7 @@ export default class Player {
     readonly map: GameMap
     location: [number, number]
     hp = 99
-    readonly preferTurnAction:  Record<TurnAction, number>
+    readonly preferTurnAction: Record<TurnAction, number>
 
     constructor(person: Person, map: GameMap, spawnLocation: [number, number]) {
         this.person = person;
@@ -48,10 +48,10 @@ export default class Player {
         assert(tile, "Tile doesn't exist")
         assert(!tile.player, "Already occupied with a player")
 
-        assert.equal(howAdjacent(this.location, [x,y]), 1, "The player must be only one degree of adjacency")
+        assert.equal(howAdjacent(this.location, [x, y]), 1, "The player must be only one degree of adjacency")
 
-        this.map.setTile(...this.location, {player: undefined})
-        this.map.setTile(x, y, {player: this})
+        this.map.setTile(...this.location, { player: undefined })
+        this.map.setTile(x, y, { player: this })
         this.location = [x, y]
     }
 
@@ -80,11 +80,13 @@ export default class Player {
 
     }
 
+    diedAtTurn?: number
+
     kill() {
         assert.equal(this.hp, 0, 'Player needs to have 0 HP to kill')
         this.person.kill(this.game.year)
-        this.map.setTile(...this.location, {player: undefined})
-
+        this.map.setTile(...this.location, { player: undefined })
+        this.diedAtTurn = this.map.turn
     }
 
 
