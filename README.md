@@ -7,3 +7,6 @@
    * `bun run start:game --print-map` can print the map to the console
 4. build website `bun run build:website`
 5. go to `./apps/visualization/out` to use the static html
+
+
+> **Continued in personal account: https://github.com/RiskyMH/Hunger-Games**
