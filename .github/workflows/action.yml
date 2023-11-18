@@ -30,9 +30,9 @@ jobs:
         with:
           bun-version: latest
 
-      # - id: install-deps
-      #   name: Install Dependencies
-      #   run: bun install
+      - id: install-deps
+        name: Install Dependencies
+        run: bun install
 
       - id: run-game
         name: Run Game
